@@ -57,3 +57,21 @@
             <button type="submit">Поиск</button>
         </form>
 
+        <!-- Список предложений вертикально -->
+        <div class="listing-vertical">
+            {% for item in listings %}
+            <div class="listing-row">
+                <img src="{{ item.image }}" alt="Apartment">
+                <div class="listing-details">
+                    <h3>{{ item.price }} Br</h3>
+                    <p>{{ item.description }}</p>
+                    <small>{{ item.details }} | {{ item.rooms }} комн | {{ item.district }} | {{ item.type }}</small>
+                </div>
+            </div>
+            {% else %}
+                <p>Нет подходящих предложений.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
