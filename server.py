@@ -120,6 +120,24 @@ def admin():
             c.execute('DELETE FROM listings WHERE id = ?', (listing_id,))
             conn.commit()
             flash('Объявление удалено.', 'listing')
+
+        elif request.form.get('action') == 'create_user':
+            username = request.form['username']
+            password = request.form['password']
+            role = int(request.form['role'])
+
+            c.execute('''
+                INSERT INTO users (username, password, role)
+                VALUES (?, ?, ?)
+            ''', (username, password, role))
+            conn.commit()
+            flash('Пользователь создан.', 'user')
+
+        elif request.form.get('action') == 'delete_user':
+            user_id = int(request.form['user_id'])
+            c.execute('DELETE FROM users WHERE id = ?', (user_id,))
+            conn.commit()
+            flash('Пользователь удален.', 'user')
     conn.close()
 
     return render_template('admin.html', username=session.get('username'), listings=listings, users=users, sort_by=sort_by, order=order)
