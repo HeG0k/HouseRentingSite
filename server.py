@@ -68,6 +68,12 @@ def login():
     else:
         flash('Неверные учетные данные.', 'danger')
         return redirect(url_for('index'))
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+@app.route('/admin', methods=['GET', 'POST'])
+@login_required
 def admin():
     if session.get('role') != 0:
         flash('Доступ запрещен.', 'danger')
