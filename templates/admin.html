@@ -34,3 +34,16 @@
         {% endwith %}
       
 
+        <!-- Список пользователей -->
+        <div class="user-list">
+            <h3>Список пользователей</h3>
+            {% for user in users %}
+            <div class="user-item">
+                <p>{{ user[1] }} ({{ 'Админ' if user[3] == 0 else 'Пользователь' }})</p>
+                <form action="/admin/delete_user/{{ user[0] }}" method="POST" style="display:inline;">
+                    <button type="submit" class="delete-button">Удалить</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
