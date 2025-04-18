@@ -47,3 +47,18 @@
             {% endfor %}
         </div>
 
+        <!-- Форма для создания нового пользователя -->
+        <div class="form-section">
+            <h3>Создать нового пользователя</h3>
+            <form action="/admin" method="POST">
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+                <input type="password" name="password" placeholder="Пароль" required>
+                <select name="role">
+                    <option value="1">Пользователь</option>
+                    <option value="0">Админ</option>
+                </select>
+                <button type="submit" name="action" value="create_user">Создать</button>
+            </form>
+        </div>
+    </div>
+
