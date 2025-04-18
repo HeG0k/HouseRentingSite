@@ -88,6 +88,30 @@ def admin():
     conn.close()
 
     return render_template('admin.html', username=session.get('username'), listings=listings, users=users, sort_by=sort_by, order=order)
+
+@app.route('/admin/create_user', methods=['POST'])
+@login_required
+def create_user():
+    if session.get('role') != 0:
+        flash('Доступ запрещен.', 'danger')
+        return redirect(url_for('admin'))
+
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+
+    username = request.form['username']
+    password = request.form['password']
+    role = int(request.form['role'])
+
+    c.execute('''
+        INSERT INTO users (username, password, role)
+        VALUES (?, ?, ?)
+    ''', (username, password, role))
+    conn.commit()
+    conn.close()
+
+    flash('Пользователь создан.', 'user')
+    return redirect(url_for('admin'))
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form['username']
