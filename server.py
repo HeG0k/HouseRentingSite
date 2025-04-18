@@ -294,6 +294,11 @@ def rent():
     conn.close()
 
     return render_template('rent.html', listings=listings)
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', username=session.get('username'))
+
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
