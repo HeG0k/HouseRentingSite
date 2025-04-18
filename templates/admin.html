@@ -12,3 +12,13 @@
             <a href="/logout" class="logout-btn">Выход</a>
         </div>
     </header>
+
+    <div class="container">
+        <h2>Управление пользователями</h2>
+
+        <!-- Форма для поиска пользователя по имени -->
+        <form method="get" action="/admin">
+            <input type="text" name="search" placeholder="Поиск по имени" value="{{ request.args.get('search', '') }}">
+            <button type="submit">Найти</button>
+        </form>
+
