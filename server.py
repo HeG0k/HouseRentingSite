@@ -54,6 +54,11 @@ def login_required(f):
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
