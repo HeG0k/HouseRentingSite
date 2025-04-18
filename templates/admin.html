@@ -84,3 +84,33 @@
             <a href="/admin?sort_by=type&order={{ 'desc' if sort_by == 'type' and order == 'asc' else 'asc' }}">Типу</a>
         </div>
 
+        <!-- Таблица всех объявлений -->
+        <table border="1" cellpadding="8">
+            <tr>
+                <th>ID</th>
+                <th>Картинка</th>
+                <th>Цена</th>
+                <th>Комнаты</th>
+                <th>Район</th>
+                <th>Город</th>
+                <th>Описание</th>
+                <th>Детали</th>
+                <th>Тип</th>
+                <th>Площадь</th>
+            </tr>
+            {% for item in listings %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td><img src="{{ item.image }}" width="80"></td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.rooms }}</td>
+                <td>{{ item.district }}</td>
+                <td>{{ item.city }}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.details }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.area }} м²</td>
+            </tr>
+            {% endfor %}
+        </table>
+
