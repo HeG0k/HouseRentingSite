@@ -235,6 +235,52 @@ def register():
     except sqlite3.IntegrityError:
         flash('Имя пользователя уже существует.', 'danger')
         return redirect(url_for('index'))
+@app.route('/rent', methods=['GET', 'POST'])
+def rent():
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    query = "SELECT * FROM listings WHERE 1"
+    filters = []
+    values = []
+
+    if request.method == 'POST':
+        min_price = request.form.get('min_price')
+        max_price = request.form.get('max_price')
+        rooms = request.form.get('rooms')
+        district = request.form.get('district')
+        type_of_property = request.form.get('type')
+
+        if min_price:
+            filters.append("price >= ?")
+            values.append(int(min_price))
+        if max_price:
+            filters.append("price <= ?")
+            values.append(int(max_price))
+        if rooms:
+            filters.append("rooms = ?")
+            values.append(int(rooms))
+        if district:
+            filters.append("district = ?")
+            values.append(district)
+        if type_of_property:
+            filters.append("type = ?")
+            values.append(type_of_property)
+
+    city = request.args.get('city')
+    if city:
+        filters.append("city = ?")
+        values.append(city)
+
+    if filters:
+        query += " AND " + " AND ".join(filters)
+
+    c.execute(query, values)
+    listings = c.fetchall()
+    conn.close()
+
+    return render_template('rent.html', listings=listings)
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
