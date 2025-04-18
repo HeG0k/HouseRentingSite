@@ -17,3 +17,43 @@
         </div>
     </header>
 
+    <div class="container">
+        <h2>Жильё в аренду и на продажу</h2>
+
+        <!-- Поиск по параметрам -->
+        <form method="post" class="filter-form-horizontal">
+            <!-- Выбор типа жилья (аренда/покупка) -->
+            <select name="type">
+                <option value="">Тип</option>
+                <option value="rent">Аренда</option>
+                <option value="sale">Покупка</option>
+            </select>
+            
+            <input type="text" name="min_price" placeholder="От">
+            <input type="text" name="max_price" placeholder="До">
+
+            <!-- Выбор количества комнат -->
+            <select name="rooms">
+                <option value="">Комнат</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7+">7+</option>
+            </select>
+
+            <!-- Выбор района -->
+            <select name="district">
+                <option value="">Район</option>
+                <option value="Центр">Центр</option>
+                <option value="Север">Север</option>
+                <option value="Юг">Юг</option>
+                <option value="Запад">Запад</option>
+                <option value="Восток">Восток</option>
+            </select>
+
+            <button type="submit">Поиск</button>
+        </form>
+
