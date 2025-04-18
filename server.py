@@ -68,6 +68,26 @@ def login():
     else:
         flash('Неверные учетные данные.', 'danger')
         return redirect(url_for('index'))
+def admin():
+    if session.get('role') != 0:
+        flash('Доступ запрещен.', 'danger')
+        return redirect(url_for('rent'))
+
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # Фильтрация пользователей по имени
+    search_username = request.args.get('search', '')
+    if search_username:
+        c.execute('SELECT * FROM users WHERE username LIKE ?', ('%' + search_username + '%',))
+    else:
+        c.execute('SELECT * FROM users')
+    
+    users = c.fetchall()
+    conn.close()
+
+    return render_template('admin.html', username=session.get('username'), listings=listings, users=users, sort_by=sort_by, order=order)
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form['username']
