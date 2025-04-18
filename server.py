@@ -5,6 +5,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import os
 from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'
+
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
 def init_db():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
