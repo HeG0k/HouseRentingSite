@@ -114,3 +114,22 @@
             {% endfor %}
         </table>
 
+        <!-- Добавление объявления -->
+        <h3>Добавить объявление</h3>
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="add">
+            <input type="file" name="image" required>
+            <input name="price" placeholder="Цена" type="number" required>
+            <input name="rooms" placeholder="Комнат" type="number" required>
+            <input name="district" placeholder="Район" required>
+            <input name="city" placeholder="Город" required>
+            <input name="description" placeholder="Описание" required>
+            <input name="details" placeholder="Детали" required>
+            <input name="area" placeholder="Площадь в м²" type="number" required>
+            <select name="type" required>
+                <option value="rent">Аренда</option>
+                <option value="sell">Продажа</option>
+            </select>
+            <button type="submit">Добавить</button>
+        </form>
+
