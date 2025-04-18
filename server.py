@@ -241,6 +241,13 @@ def register():
     except sqlite3.IntegrityError:
         flash('Имя пользователя уже существует.', 'danger')
         return redirect(url_for('index'))
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('Вы вышли из аккаунта.', 'success')
+    return redirect(url_for('index'))
+
 @app.route('/rent', methods=['GET', 'POST'])
 def rent():
     conn = sqlite3.connect('users.db')
