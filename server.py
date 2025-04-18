@@ -18,5 +18,22 @@ def init_db():
             role INTEGER NOT NULL DEFAULT 1
         )
     ''')
+
+    # Создание таблицы объявлений с добавленным полем для площади
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS listings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            image TEXT,
+            price INTEGER,
+            rooms INTEGER,
+            district TEXT,
+            description TEXT,
+            details TEXT,
+            type TEXT,
+            city TEXT,
+            area INTEGER
+        )
+    ''')
+
     conn.commit()
     conn.close()
