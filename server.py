@@ -138,6 +138,18 @@ def admin():
             c.execute('DELETE FROM users WHERE id = ?', (user_id,))
             conn.commit()
             flash('Пользователь удален.', 'user')
+
+    # Сортировка
+    sort_by = request.args.get('sort_by', 'id')
+    order = request.args.get('order', 'asc')
+    if sort_by not in ['id', 'price', 'rooms', 'type']:
+        sort_by = 'id'
+    if order not in ['asc', 'desc']:
+        order = 'asc'
+
+    c.execute(f'SELECT * FROM listings ORDER BY {sort_by} {order.upper()}')
+    listings = c.fetchall()
+
     conn.close()
 
     return render_template('admin.html', username=session.get('username'), listings=listings, users=users, sort_by=sort_by, order=order)
