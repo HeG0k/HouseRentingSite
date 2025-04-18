@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Аренда жилья - Авторизация</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <script>
+      let isLogin = {{ 'false' if show_register else 'true' }};
+    
+      function toggleForm() {
+        isLogin = !isLogin;
+        updateForm();
+        clearAlerts();
+      }
+    
+      function updateForm() {
+        document.getElementById("login-form").style.display = isLogin ? 'block' : 'none';
+        document.getElementById("register-form").style.display = isLogin ? 'none' : 'block';
+        document.getElementById("toggle-button").innerText = isLogin ? 'Перейти к регистрации' : 'Перейти ко входу';
+        document.getElementById("form-title").innerText = isLogin ? 'Вход в аккаунт' : 'Регистрация';
+      }
+    
+      function clearAlerts() {
+        const alertContainer = document.querySelectorAll('.alert');
+        alertContainer.forEach(alert => alert.remove());
+      }
+    
+      window.onload = updateForm;
+    </script>
+</head>
