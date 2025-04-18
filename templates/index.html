@@ -42,5 +42,13 @@
           {% endwith %}
         </div>
 
+        <div id="login-form" class="form-section">
+            <form action="/login" method="post">
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+                <input type="text" name="password" placeholder="Пароль" required>
+                <button type="submit">Войти</button>
+            </form>
+        </div>
+
     </div>
 </body>
