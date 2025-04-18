@@ -37,6 +37,15 @@ def init_db():
 
     conn.commit()
     conn.close()
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Пожалуйста, авторизуйтесь', 'danger')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
