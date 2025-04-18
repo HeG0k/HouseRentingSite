@@ -46,6 +46,28 @@ def login_required(f):
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE username=?", (username,))
+    user = c.fetchone()
+    conn.close()
+
+    if user and check_password_hash(user[2], password):
+        session['user_id'] = user[0]
+        session['username'] = user[1]
+        session['role'] = user[3]
+        if user[3] == 0:
+            return redirect('/admin')
+        else:
+            return redirect('/rent')
+    else:
+        flash('Неверные учетные данные.', 'danger')
+        return redirect(url_for('index'))
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
