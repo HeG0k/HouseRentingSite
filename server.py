@@ -68,6 +68,46 @@ def login():
     else:
         flash('Неверные учетные данные.', 'danger')
         return redirect(url_for('index'))
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.form['username']
+    password = request.form['password']
+
+    if ' ' in username or ' ' in password:
+        flash('Пробелы запрещены в имени пользователя и пароле.', 'danger')
+        return render_template('index.html', show_register=True)
+
+    if not (1 <= len(username) <= 32):
+        flash('Имя пользователя должно быть от 1 до 32 символов.', 'danger')
+        return render_template('index.html', show_register=True)
+
+    if not (8 <= len(password) <= 32):
+        flash('Пароль должен быть от 8 до 32 символов.', 'danger')
+        return render_template('index.html', show_register=True)
+
+    hashed_password = generate_password_hash(password)
+
+    try:
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        c.execute("INSERT INTO users (username, password, role) VALUES (?, ?, 1)", (username, hashed_password))
+        conn.commit()
+
+        # Получаем ID нового пользователя
+        c.execute("SELECT id, role FROM users WHERE username = ?", (username,))
+        user = c.fetchone()
+        conn.close()
+
+        # Сохраняем в сессию
+        session['user_id'] = user[0]
+        session['username'] = username
+        session['role'] = user[1]
+
+        return redirect('/rent' if user[1] == 1 else '/admin')
+
+    except sqlite3.IntegrityError:
+        flash('Имя пользователя уже существует.', 'danger')
+        return redirect(url_for('index'))
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
