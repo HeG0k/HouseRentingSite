@@ -75,3 +75,12 @@
             {% endif %}
         {% endwith %}
 
+        <!-- Сортировка -->
+        <div class="sort-links">
+            <strong>Сортировать по:</strong>
+            <a href="/admin?sort_by=id&order={{ 'desc' if sort_by == 'id' and order == 'asc' else 'asc' }}">ID</a> |
+            <a href="/admin?sort_by=price&order={{ 'desc' if sort_by == 'price' and order == 'asc' else 'asc' }}">Цене</a> |
+            <a href="/admin?sort_by=rooms&order={{ 'desc' if sort_by == 'rooms' and order == 'asc' else 'asc' }}">Комнатам</a> |
+            <a href="/admin?sort_by=type&order={{ 'desc' if sort_by == 'type' and order == 'asc' else 'asc' }}">Типу</a>
+        </div>
+
