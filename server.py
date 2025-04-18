@@ -85,6 +85,41 @@ def admin():
         c.execute('SELECT * FROM users')
     
     users = c.fetchall()
+
+    # Добавление нового объявления
+    if request.method == 'POST':
+        if request.form.get('action') == 'add':
+            # Загружаем изображение
+            image = None
+            if 'image' in request.files:
+                file = request.files['image']
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    file.save(image_path)
+                    image = f"/static/uploads/{filename}"
+
+            price = int(request.form['price'])
+            rooms = int(request.form['rooms'])
+            district = request.form['district']
+            description = request.form['description']
+            details = request.form['details']
+            listing_type = request.form['type']
+            city = request.form['city']
+            area = int(request.form['area'])
+
+            c.execute('''
+                INSERT INTO listings (image, price, rooms, district, description, details, type, city, area)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (image, price, rooms, district, description, details, listing_type, city, area))
+            conn.commit()
+            flash('Объявление добавлено.', 'listing')
+
+        elif request.form.get('action') == 'delete':
+            listing_id = int(request.form['listing_id'])
+            c.execute('DELETE FROM listings WHERE id = ?', (listing_id,))
+            conn.commit()
+            flash('Объявление удалено.', 'listing')
     conn.close()
 
     return render_template('admin.html', username=session.get('username'), listings=listings, users=users, sort_by=sort_by, order=order)
