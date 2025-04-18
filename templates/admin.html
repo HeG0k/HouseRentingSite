@@ -62,3 +62,16 @@
         </div>
     </div>
 
+    <div class="container">
+        <h2>Управление объявлениями</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == 'listing' %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
