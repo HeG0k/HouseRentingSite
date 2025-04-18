@@ -31,5 +31,16 @@
 <body>
     <div class="centered-container">
         <h2 id="form-title">Вход в аккаунт</h2>
+
+        <div class="form-section">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
+
     </div>
 </body>
