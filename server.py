@@ -661,6 +661,42 @@ def profile():
                        profile_image=user['profile_image'],
                        listings=listings,
                        )
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """
+    Обрабатывает вход пользователя в систему.
+    При GET-запросе отображает страницу входа (часть index.html).
+    При POST-запросе проверяет учетные данные и аутентифицирует пользователя.
+    """
+    # Если GET-запрос, просто отображаем главную страницу, которая содержит форму входа
+    if request.method == 'GET':
+        return render_template('index.html')
+
+    # Если POST-запрос, обрабатываем данные формы входа
+    username = request.form['username']
+    password = request.form['password']
+
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    # Ищем пользователя по имени
+    c.execute("SELECT * FROM users WHERE username=?", (username,))
+    user = c.fetchone() # Получаем данные пользователя (id, username, password_hash, role, ...)
+    conn.close()
+
+    # Проверяем, найден ли пользователь и совпадает ли хеш пароля
+    if user and check_password_hash(user[2], password): # user[2] - это хешированный пароль
+        # Успешная аутентификация: сохраняем данные пользователя в сессии
+        session['user_id'] = user[0] # id
+        session['username'] = user[1] # username
+        session['role'] = user[3] # role
+        # Перенаправляем администратора в админ-панель, обычного пользователя - на страницу аренды
+        return redirect('/admin' if user[3] == 0 else '/rent')
+    else:
+        # Неверные учетные данные
+        flash('Неверные учетные данные.', 'danger')
+        return redirect(url_for('index')) # Возвращаем на главную страницу (с формой входа)
+
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form['username']
