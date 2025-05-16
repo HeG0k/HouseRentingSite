@@ -1,0 +1,55 @@
+{% extends "admin_base.html" %} <!-- Наследование от базового шаблона админ-панели -->
+
+{% block content %} <!-- Начало блока основного контента -->
+<h1>Управление объявлениями</h1>
+
+<!-- Форма для фильтрации объявлений по различным параметрам -->
+<form method="GET" action="{{ url_for('admin_listings') }}" style="margin-bottom:15px;">
+    <input type="text" name="city" placeholder="Город" value="{{ city }}"> <!-- Фильтр по городу -->
+    <input type="number" name="rooms" placeholder="Комнаты" value="{{ rooms }}" min="1" style="width:80px;"> <!-- Фильтр по количеству комнат -->
+    <select name="housing_type"> <!-- Фильтр по типу жилья -->
+        <option value="">Тип (все)</option>
+        <option value="квартира" {% if housing_type == 'квартира' %}selected{% endif %}>Квартира</option>
+        <option value="дом" {% if housing_type == 'дом' %}selected{% endif %}>Дом</option>
+        <option value="комната" {% if housing_type == 'комната' %}selected{% endif %}>Комната</option>
+    </select>
+    <select name="deal_type"> <!-- Фильтр по типу сделки -->
+        <option value="">Сделка (все)</option>
+        <option value="продажа" {% if deal_type == 'продажа' %}selected{% endif %}>Продажа</option>
+        <option value="аренда" {% if deal_type == 'аренда' %}selected{% endif %}>Аренда</option>
+    </select>
+    <button type="submit">Поиск</button>
+</form>
+
+<!-- Таблица для отображения списка объявлений -->
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Разместил</th> <!-- Имя пользователя, разместившего объявление -->
+      <th>Цена</th>
+      <th>Комнаты</th>
+      <th>Тип</th> <!-- Тип жилья (квартира, дом, комната) -->
+      <th>Действия</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for listing in listings %} <!-- Цикл для вывода информации о каждом объявлении -->
+    <tr>
+      <td>{{ listing['id'] }}</td>
+      <td>{{ listing['username'] or '—' }}</td> <!-- Отображение имени пользователя или прочерка, если не указано -->
+      <td>{{ listing['price'] }}</td>
+      <td>{{ listing['rooms'] }}</td>
+      <td>{{ listing['housing_type'] }}</td>
+      <td>
+        <!-- Форма для удаления объявления с подтверждением -->
+        <form method="POST" action="{{ url_for('delete_listing') }}" onsubmit="return confirm('Удалить объявление?');">
+          <input type="hidden" name="listing_id" value="{{ listing['id'] }}"> <!-- Скрытое поле с ID объявления для удаления -->
+          <button type="submit">Удалить</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %} <!-- Конец блока основного контента -->

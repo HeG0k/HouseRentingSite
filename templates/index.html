@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Аренда жилья - Авторизация</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <script>
+<<<<<<< Updated upstream
+      let isLogin = {{ 'false' if show_register else 'true' }};
+    
+      function toggleForm() {
+        isLogin = !isLogin;
+        updateForm();
+        clearAlerts();
+      }
+    
+=======
+      // Переменная для отслеживания, какая форма активна: входа или регистрации.
+      // Инициализируется в зависимости от того, была ли ошибка на форме регистрации (show_register).
+      let isLogin = {{ 'false' if show_register else 'true' }}; 
+    
+      // Функция для переключения между формами входа и регистрации.
+      function toggleForm() {
+        isLogin = !isLogin; // Инвертирование состояния
+        updateForm(); // Обновление отображения форм
+        clearAlerts(); // Очистка предыдущих сообщений об ошибках/успехе
+      }
+    
+      // Функция для обновления отображения форм и текста элементов.
+>>>>>>> Stashed changes
+      function updateForm() {
+        document.getElementById("login-form").style.display = isLogin ? 'block' : 'none';
+        document.getElementById("register-form").style.display = isLogin ? 'none' : 'block';
+        document.getElementById("toggle-button").innerText = isLogin ? 'Перейти к регистрации' : 'Перейти ко входу';
+        document.getElementById("form-title").innerText = isLogin ? 'Вход в аккаунт' : 'Регистрация';
+      }
+    
+<<<<<<< Updated upstream
+=======
+      // Функция для удаления всех flash-сообщений.
+>>>>>>> Stashed changes
+      function clearAlerts() {
+        const alertContainer = document.querySelectorAll('.alert');
+        alertContainer.forEach(alert => alert.remove());
+      }
+    
+<<<<<<< Updated upstream
+=======
+      // Вызов updateForm при загрузке страницы для установки начального состояния форм.
+>>>>>>> Stashed changes
+      window.onload = updateForm;
+    </script>
+</head>
+<body>
+    <div class="centered-container">
+<<<<<<< Updated upstream
+        <h2 id="form-title">Вход в аккаунт</h2>
+
+        <div class="form-section">
+=======
+        <h2 id="form-title">Вход в аккаунт</h2> <!-- Заголовок формы, изменяется динамически -->
+
+        <div class="form-section">
+          <!-- Блок для отображения flash-сообщений от Flask (например, ошибки валидации) -->
+>>>>>>> Stashed changes
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
+
+<<<<<<< Updated upstream
+=======
+        <!-- Форма входа -->
+>>>>>>> Stashed changes
+        <div id="login-form" class="form-section">
+            <form action="/login" method="post">
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+                <input type="text" name="password" placeholder="Пароль" required>
+                <button type="submit">Войти</button>
+            </form>
+        </div>
+
+<<<<<<< Updated upstream
+=======
+        <!-- Форма регистрации, изначально скрыта -->
+>>>>>>> Stashed changes
+        <div id="register-form" class="form-section" style="display: none;">
+            <form action="/register" method="post">
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+                <input type="text" name="password" placeholder="Пароль" required>
+                <button type="submit">Зарегистрироваться</button>
+            </form>
+        </div>
+
+        <div class="form-section">
+<<<<<<< Updated upstream
+=======
+          <!-- Кнопка для переключения между формами входа и регистрации -->
+>>>>>>> Stashed changes
+          <button id="toggle-button" class="toggle-switch" onclick="toggleForm()">Перейти к регистрации</button>
+        </div>
+      
+        <div class="form-section">
+<<<<<<< Updated upstream
+=======
+          <!-- Ссылка для продолжения без аутентификации -->
+>>>>>>> Stashed changes
+          <a href="{{ url_for('rent') }}" class="guest-link">Продолжить без входа</a>
+        </div>
+    </div>
+</body>
+<<<<<<< Updated upstream
+</html>
+=======
+</html>
+>>>>>>> Stashed changes

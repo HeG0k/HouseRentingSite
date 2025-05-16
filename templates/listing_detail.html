@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Объявление{% endblock %}
+
+{% block content %}
+{% block page_styles %} <!-- Блок для подключения CSS, специфичных для детальной страницы объявления -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='listing_detail.css') }}">
+{% endblock %}
+
+<div class="listing-detail"> <!-- Основной контейнер для деталей объявления -->
+    <img src="{{ listing.image }}" alt="Фото жилья" class="listing-main-image">
+
+    <h2>{{ listing.price }} Br</h2>
+    <p>{{ listing.description }}</p>
+    <p><strong>Город:</strong> {{ listing.city }}</p>
+    <p><strong>Комнат:</strong> {{ listing.rooms }}</p>
+    <p><strong>Площадь:</strong> {{ listing.area }} м²</p>
+    <p><strong>Подробности:</strong> {{ listing.details }}</p>
+    <p><strong>Телефон:</strong> {{ listing.phone }}</p>
+
+    {% if listing.display_name %} <!-- Условие для отображения информации об авторе, если имя доступно -->
+        <hr>
+        <div class="author-box"> <!-- Блок с информацией об авторе объявления -->
+            <strong>Разместил:</strong>
+            {% if listing.profile_image %} <!-- Условие для отображения аватара автора, если он есть -->
+                <img src="{{ listing.profile_image }}" alt="Профиль" class="profile-avatar">
+            {% endif %}
+            <span>{{ listing.display_name }}</span>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

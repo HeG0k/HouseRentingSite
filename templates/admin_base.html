@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Админка - {{ title }}</title> <!-- Динамический заголовок страницы, передаваемый из Flask -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}"> <!-- Подключение CSS для админ-панели -->
+</head>
+<body>
+
+<!-- Навигационная панель админки -->
+<nav style="background:#eee; padding:10px;">
+  <ul style="list-style:none; display:flex; gap:20px; margin:0; padding:0;">
+    <!-- Ссылка на управление пользователями, активна, если текущий путь /admin/users -->
+    <li><a href="{{ url_for('admin_users') }}" {% if request.path == '/admin/users' %}style="font-weight:bold;"{% endif %}>Пользователи</a></li>
+    <!-- Ссылка на управление объявлениями, активна, если текущий путь /admin/listings -->
+    <li><a href="{{ url_for('admin_listings') }}" {% if request.path == '/admin/listings' %}style="font-weight:bold;"{% endif %}>Объявления</a></li>
+    <li><a href="{{ url_for('rent') }}">Назад к сайту</a></li> <!-- Ссылка для возврата на основную часть сайта -->
+    <li><a href="{{ url_for('logout') }}">Выйти</a></li> <!-- Ссылка для выхода из системы -->
+  </ul>
+</nav>
+
+<hr>
+
+<div>
+  <!-- Блок для отображения flash-сообщений (уведомлений) от Flask -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <!-- Стилизация цвета сообщения в зависимости от его категории -->
+        <p style="color: {% if category == 'danger' %}red{% elif category in ['user', 'listing'] %}green{% else %}black{% endif %};">
+          {{ message }}
+        </p>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+
+{% block content %}{% endblock %} <!-- Основной блок для контента конкретной страницы админ-панели -->
+
+</body>
+</html>

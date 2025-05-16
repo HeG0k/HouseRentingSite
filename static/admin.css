@@ -1,0 +1,213 @@
+<<<<<<< Updated upstream
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    font-family: sans-serif;
+}
+
+h2, h3 {
+    margin-top: 30px;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+    background-color: #fafafa;
+}
+
+table th, table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+
+table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+table img {
+    max-height: 80px;
+    border-radius: 6px;
+}
+
+input, select, button {
+    padding: 10px;
+    margin: 5px 0;
+    font-size: 1em;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+form {
+    margin-bottom: 30px;
+}
+
+.alert {
+    padding: 10px;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.alert.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.sort-links {
+    margin: 15px 0;
+    font-size: 0.95em;
+}
+
+.sort-links a {
+    margin-right: 10px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.sort-links a:hover {
+    text-decoration: underline;
+}
+
+.logout-btn {
+    color: red;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: #f8d7da;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.logout-btn:hover {
+    background-color: #f5c6cb;
+    text-decoration: underline;
+}
+
+.alert.user {
+    background-color: #e0f7fa;
+    color: #00796b;
+}
+
+.alert.listing {
+    background-color: #f1f8e9;
+    color: #33691e;
+}
+=======
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 40px; 
+}
+
+h1, h2 {
+    color: #0056b3;
+    font-weight: 600;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    margin-left: 10px; 
+}
+
+form {
+    margin: 0 0 20px 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+form input[type="text"],
+form input[type="number"],
+form select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+}
+
+form button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background-color: #007BFF;
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-left: 10px;
+}
+
+table th, table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+table th {
+    background-color: #eaf3ff;
+    color: #0056b3;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+table tr:hover {
+    background-color: #f6f9fc;
+}
+
+td form button {
+    background-color: #dc3545;
+}
+
+td form button:hover {
+    background-color: #a71d2a;
+}
+
+>>>>>>> Stashed changes

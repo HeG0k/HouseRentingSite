@@ -1,0 +1,47 @@
+{% extends "admin_base.html" %} <!-- Наследование от базового шаблона админ-панели -->
+
+{% block content %} <!-- Начало блока основного контента -->
+<h1>Управление пользователями</h1>
+
+<!-- Форма для поиска пользователей по имени -->
+<form method="GET" action="{{ url_for('admin_users') }}">
+  <input type="text" name="search" placeholder="Поиск по имени" value="{{ request.args.get('search', '') }}">
+  <button type="submit">Поиск</button>
+</form>
+
+<!-- Таблица для отображения списка пользователей -->
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>ID</th><th>Имя</th><th>Роль</th><th>Действия</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %} <!-- Цикл для вывода информации о каждом пользователе -->
+    <tr>
+      <td>{{ user['id'] }}</td>
+      <td>{{ user['username'] }}</td>
+      <td>{{ user['role'] }}</td> <!-- Роль пользователя (0 - админ, 1 - обычный) -->
+      <td>
+        <!-- Форма для удаления пользователя с подтверждением -->
+        <form method="POST" action="{{ url_for('delete_user', user_id=user['id']) }}" onsubmit="return confirm('Удалить пользователя?');">
+          <button type="submit">Удалить</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Создать нового пользователя</h2>
+<!-- Форма для создания нового пользователя -->
+<form method="POST" action="{{ url_for('create_user') }}">
+  <input type="text" name="username" placeholder="Имя пользователя" required>
+  <input type="password" name="password" placeholder="Пароль" required>
+  <select name="role" required> <!-- Выбор роли для нового пользователя -->
+    <option value="0">Администратор</option>
+    <option value="1">Пользователь</option>
+  </select>
+  <button type="submit">Создать</button>
+</form>
+{% endblock %} <!-- Конец блока основного контента -->

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Жильё{% endblock %}</title> <!-- Блок для заголовка страницы, по умолчанию "Жильё" -->
+    
+        {% block head %} <!-- Блок для дополнительных элементов в <head>, например, подключения CSS -->
+            <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}"> <!-- Подключение базового CSS файла -->
+        {% endblock %}
+    </head>
+    
+<body>
+
+    <header class="top-nav"> <!-- Шапка сайта с навигацией -->
+        <div class="nav-left"> <!-- Левая часть навигации -->
+            <a href="/rent">Аренда</a>
+            <a href="/sale">Покупка</a>
+            <a href="/favorites">❤ Избранное</a>
+            <a href="/add">+ Добавить объявление</a>
+    
+            {% if session.get('role') == 0 %} <!-- Условное отображение: ссылка для администратора (роль 0) -->
+                <a href="{{ url_for('admin_users') }}" class="admin-btn">К управлению</a>
+            {% endif %}
+        </div>
+        <div class="nav-right"> <!-- Правая часть навигации -->
+            {% if user_id %} <!-- Условное отображение: ссылки для авторизованного пользователя -->
+                <a href="/profile">Личный кабинет</a>
+                <a href="/logout">Выход</a>
+            {% else %} <!-- Условное отображение: ссылка для неавторизованного пользователя -->
+                <a href="/login">Войти</a>
+            {% endif %}
+        </div>
+    </header>
+    
+    
+
+<div class="container"> <!-- Основной контейнер для контента страницы -->
+    {% with messages = get_flashed_messages(with_categories=true) %} <!-- Блок для отображения flash-сообщений (уведомлений) -->
+        {% for category, message in messages %} <!-- Перебор всех flash-сообщений -->
+            <div class="flash {{ category }}">{{ message }}</div> <!-- Отображение сообщения с соответствующей категорией (для стилизации) -->
+        {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %} <!-- Блок для основного контента, который будет заменяться в дочерних шаблонах -->
+</div>
+
+</body>
+</html>

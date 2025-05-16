@@ -1,0 +1,48 @@
+{% extends "base.html" %} <!-- Наследование от базового шаблона "base.html" -->
+
+{% block title %}Покупка недвижимости{% endblock %} <!-- Определение заголовка страницы -->
+
+{% block content %} <!-- Начало блока основного контента страницы -->
+<h2>Покупка недвижимости</h2>
+
+{% block page_styles %} <!-- Блок для специфичных для страницы стилей -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='sale.css') }}"> <!-- Подключение CSS файла для этой страницы -->
+{% endblock %}
+
+<!-- Форма для фильтрации объявлений о покупке -->
+<form method="post" class="filter-form-horizontal">
+    <input type="text" name="min_price" placeholder="От"> <!-- Поле для минимальной цены -->
+    <input type="text" name="max_price" placeholder="До"> <!-- Поле для максимальной цены -->
+    <select name="rooms"> <!-- Выпадающий список для выбора количества комнат -->
+        <option value="">Комнат</option>
+        {% for r in range(1, 8) %} <!-- Цикл для генерации опций количества комнат -->
+            <option value="{{ r }}">{{ r if r < 7 else '7+' }}</option>
+        {% endfor %}
+    </select>
+    <input type="text" name="city" placeholder="Город"> <!-- Поле для ввода города -->
+
+    <button type="submit">Поиск</button> <!-- Кнопка для отправки формы и применения фильтров -->
+</form>
+
+<div class="listing-vertical"> <!-- Контейнер для отображения списка объявлений -->
+    {% for item in listings %} <!-- Цикл для перебора каждого объявления в списке 'listings' -->
+    <div class="listing-row"> <!-- Контейнер для одного объявления -->
+        <img src="{{ item.image }}" alt="Apartment"> <!-- Изображение объявления -->
+        <div class="listing-details">
+            <a href="{{ url_for('listing_detail', listing_id=item.id) }}"> <!-- Ссылка на детальную страницу объявления -->
+                <h3>{{ item.price }} Br</h3> <!-- Цена объявления -->
+            </a>
+            <p>{{ item.description }}</p> <!-- Краткое описание -->
+            <small>{{ item.details }} | {{ item.rooms }} комн | {{ item.type }}</small> <!-- Дополнительные детали: детали, комнаты, тип -->
+            <small>Телефон: {{ item.phone }}</small> <!-- Телефон продавца/арендодателя -->
+        </div>
+        <!-- Форма для добавления объявления в избранное -->
+        <form method="post" action="/add_favorite/{{ item.id }}">
+            <button type="submit">❤</button> <!-- Кнопка "Добавить в избранное" -->
+        </form>
+    </div>
+    {% else %}
+        <p>Нет подходящих предложений.</p> <!-- Сообщение, если список объявлений пуст -->
+    {% endfor %}
+</div>
+{% endblock %} <!-- Конец блока основного контента -->

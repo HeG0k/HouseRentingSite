@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Избранное{% endblock %}
+
+{% block content %}
+<h2 class="favorites-title">Избранные объявления</h2>
+
+{% block page_styles %} <!-- Блок для подключения CSS, специфичных для страницы избранного -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='favorites.css') }}">
+{% endblock %}
+
+<div class="favorites-grid"> <!-- Контейнер для отображения избранных объявлений в виде сетки -->
+    {% for item in favorites %} <!-- Цикл для перебора каждого объявления в списке избранного -->
+        <div class="favorites-card"> <!-- Карточка одного избранного объявления -->
+            <img src="{{ item.image }}" alt="Apartment" class="favorites-image">
+            <div class="favorites-info"> <!-- Блок с информацией об объявлении -->
+                <a href="{{ url_for('listing_detail', listing_id=item.id) }}">
+                    <h3 class="favorites-price">{{ item.price }} Br</h3>
+                </a>
+                <p class="favorites-description">{{ item.description }}</p>
+                <p class="favorites-meta">
+                    {{ item.details }} • {{ item.rooms }} комн • {{ item.type }}
+                </p>
+                <p class="favorites-phone">📞 {{ item.phone }}</p>
+            </div>
+            <!-- Форма для удаления объявления из избранного -->
+            <form method="post" action="/remove_favorite/{{ item.id }}" class="favorites-remove-form">
+                <button type="submit">🗑 Удалить</button>
+            </form>
+        </div>
+    {% else %}
+        <!-- Сообщение, отображаемое, если список избранного пуст -->
+        <p class="no-favorites">Нет добавленных в избранное объявлений.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Добавить объявление{% endblock %}
+
+{% block content %}
+<h2>Добавить объявление</h2>
+
+{% block page_styles %} <!-- Блок для подключения CSS, специфичных для страницы добавления объявления -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_listing.css') }}">
+{% endblock %}
+
+<!-- Форма для добавления нового объявления. enctype="multipart/form-data" необходим для загрузки файлов (изображения) -->
+<form method="post" enctype="multipart/form-data" class="auth-box form-wide">
+
+    <input type="text" name="price" placeholder="Цена (Br)" required>
+    <input type="text" name="description" placeholder="Описание" required>
+    <input type="text" name="details" placeholder="Детали (например, рядом с метро)" required>
+
+    <select name="deal_type" required> <!-- Выбор типа сделки: аренда или покупка -->
+        <option value="">Тип</option>
+        <option value="rent">Аренда</option>
+        <option value="sale">Покупка</option>
+    </select>
+
+    <select name="housing_type" id="housing_type" required> <!-- Выбор типа жилья -->
+        <option value="">Выберите тип жилья</option>
+        <option value="дом">Дом</option>
+        <option value="квартира">Квартира</option>
+        <option value="комната">Комната</option>
+    </select>
+
+    <select name="rooms" id="rooms" required> <!-- Выбор количества комнат, будет управляться JS -->
+        <option value="">Комнат</option>
+        {% for r in range(1, 8) %}
+            <option value="{{ r }}">{{ r if r < 7 else '7+' }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="text" name="city" placeholder="Город" required>
+    <input type="text" name="area" placeholder="Площадь (кв.м.)" required>
+    <input type="text" name="phone" placeholder="Номер телефона" required>
+    <input type="file" name="image" accept="image/*" required> <!-- Поле для загрузки изображения объявления -->
+    <button type="submit">Добавить</button>
+</form>
+
+<!-- JavaScript для управления полем "Комнаты" в зависимости от выбранного "Типа жилья" -->
+<script>
+    // Получаем ссылки на элементы select для типа жилья и количества комнат
+    const housingSelect = document.getElementById('housing_type');
+    const roomsSelect = document.getElementById('rooms');
+
+    // Функция для переключения состояния (активно/неактивно) поля "Комнаты"
+    function toggleRooms() {
+        if (housingSelect.value === 'комната') { // Если выбран тип жилья "комната"
+            roomsSelect.value = ''; // Сбрасываем значение поля "Комнаты"
+            roomsSelect.disabled = true; // Делаем поле "Комнаты" неактивным
+        } else {
+            roomsSelect.disabled = false; // В противном случае делаем поле "Комнаты" активным
+        }
+    }
+
+    // Добавляем обработчик события 'change' для поля "Тип жилья", чтобы вызывать toggleRooms при изменении
+    housingSelect.addEventListener('change', toggleRooms);
+    // Также вызываем toggleRooms при загрузке страницы, чтобы установить начальное состояние поля "Комнаты"
+    window.addEventListener('load', toggleRooms);
+</script>
+{% endblock %}

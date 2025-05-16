@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель администратора</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+    <header class="top-nav">
+        <div class="nav-right">
+            <span>{{ username }}</span>
+            <a href="/logout" class="logout-btn">Выход</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Управление пользователями</h2>
+
+        <!-- Форма для поиска пользователя по имени -->
+        <form method="get" action="/admin">
+            <input type="text" name="search" placeholder="Поиск по имени" value="{{ request.args.get('search', '') }}">
+            <button type="submit">Найти</button>
+        </form>
+
+        <!-- Сообщения об успешном добавлении и удалении пользователей -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == 'user' %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+      
+
+        <!-- Список пользователей -->
+        <div class="user-list">
+            <h3>Список пользователей</h3>
+            {% for user in users %}
+            <div class="user-item">
+                <p>{{ user[1] }} ({{ 'Админ' if user[3] == 0 else 'Пользователь' }})</p>
+                <form action="/admin/delete_user/{{ user[0] }}" method="POST" style="display:inline;">
+                    <button type="submit" class="delete-button">Удалить</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Форма для создания нового пользователя -->
+        <div class="form-section">
+            <h3>Создать нового пользователя</h3>
+            <form action="/admin" method="POST">
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+                <input type="password" name="password" placeholder="Пароль" required>
+                <select name="role">
+                    <option value="1">Пользователь</option>
+                    <option value="0">Админ</option>
+                </select>
+                <button type="submit" name="action" value="create_user">Создать</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Управление объявлениями</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == 'listing' %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Сортировка -->
+        <div class="sort-links">
+            <strong>Сортировать по:</strong>
+            <a href="/admin?sort_by=id&order={{ 'desc' if sort_by == 'id' and order == 'asc' else 'asc' }}">ID</a> |
+            <a href="/admin?sort_by=price&order={{ 'desc' if sort_by == 'price' and order == 'asc' else 'asc' }}">Цене</a> |
+            <a href="/admin?sort_by=rooms&order={{ 'desc' if sort_by == 'rooms' and order == 'asc' else 'asc' }}">Комнатам</a> |
+            <a href="/admin?sort_by=type&order={{ 'desc' if sort_by == 'type' and order == 'asc' else 'asc' }}">Типу</a>
+        </div>
+
+        <!-- Таблица всех объявлений -->
+        <table border="1" cellpadding="8">
+            <tr>
+                <th>ID</th>
+                <th>Картинка</th>
+                <th>Цена</th>
+                <th>Комнаты</th>
+                <th>Район</th>
+                <th>Город</th>
+                <th>Описание</th>
+                <th>Детали</th>
+                <th>Тип</th>
+                <th>Площадь</th>
+            </tr>
+            {% for item in listings %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td><img src="{{ item.image }}" width="80"></td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.rooms }}</td>
+                <td>{{ item.district }}</td>
+                <td>{{ item.city }}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.details }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.area }} м²</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- Добавление объявления -->
+        <h3>Добавить объявление</h3>
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="add">
+            <input type="file" name="image" required>
+            <input name="price" placeholder="Цена" type="number" required>
+            <input name="rooms" placeholder="Комнат" type="number" required>
+            <input name="district" placeholder="Район" required>
+            <input name="city" placeholder="Город" required>
+            <input name="description" placeholder="Описание" required>
+            <input name="details" placeholder="Детали" required>
+            <input name="area" placeholder="Площадь в м²" type="number" required>
+            <select name="type" required>
+                <option value="rent">Аренда</option>
+                <option value="sell">Продажа</option>
+            </select>
+            <button type="submit">Добавить</button>
+        </form>
+
+        <!-- Удаление объявления -->
+        <h3>Удалить объявление по ID</h3>
+        <form method="post">
+            <input type="hidden" name="action" value="delete">
+            <input name="listing_id" placeholder="ID объявления" type="number" required>
+            <button type="submit">Удалить</button>
+        </form>
+    </div>
+</body>
+</html>

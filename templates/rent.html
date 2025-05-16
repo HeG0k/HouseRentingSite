@@ -1,0 +1,160 @@
+<<<<<<< Updated upstream
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Жильё в аренду и на продажу</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Навигация в шапке -->
+    <header class="top-nav">
+        <div class="nav-left">
+            <a href="/rent" class="active">Поиск</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile">Личный кабинет</a>
+            <a href="/logout">Выход</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Жильё в аренду и на продажу</h2>
+
+        <!-- Поиск по параметрам -->
+        <form method="post" class="filter-form-horizontal">
+            <!-- Выбор типа жилья (аренда/покупка) -->
+            <select name="type">
+                <option value="">Тип</option>
+                <option value="rent">Аренда</option>
+                <option value="sale">Покупка</option>
+            </select>
+            
+            <input type="text" name="min_price" placeholder="От">
+            <input type="text" name="max_price" placeholder="До">
+
+            <!-- Выбор количества комнат -->
+            <select name="rooms">
+                <option value="">Комнат</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7+">7+</option>
+            </select>
+
+            <!-- Выбор района -->
+            <select name="district">
+                <option value="">Район</option>
+                <option value="Центр">Центр</option>
+                <option value="Север">Север</option>
+                <option value="Юг">Юг</option>
+                <option value="Запад">Запад</option>
+                <option value="Восток">Восток</option>
+            </select>
+
+            <button type="submit">Поиск</button>
+        </form>
+
+        <!-- Список предложений вертикально -->
+        <div class="listing-vertical">
+            {% for item in listings %}
+            <div class="listing-row">
+                <img src="{{ item.image }}" alt="Apartment">
+                <div class="listing-details">
+                    <h3>{{ item.price }} Br</h3>
+                    <p>{{ item.description }}</p>
+                    <small>{{ item.details }} | {{ item.rooms }} комн | {{ item.district }} | {{ item.type }}</small>
+                </div>
+            </div>
+            {% else %}
+                <p>Нет подходящих предложений.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
+=======
+{% extends "base.html" %} <!-- Наследование от базового шаблона "base.html" -->
+
+{% block title %}Жильё в аренду{% endblock %} <!-- Заголовок страницы -->
+    
+{% block content %} <!-- Начало блока основного контента -->
+<h2>Жильё в аренду</h2>
+
+{% block page_styles %} <!-- Блок для подключения CSS стилей, специфичных для этой страницы -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='rent.css') }}">
+{% endblock %}
+
+<!-- Форма для фильтрации объявлений об аренде -->
+<form method="post" class="filter-form-horizontal">
+    <!-- фильтры -->
+    <input type="text" name="min_price" placeholder="От"> <!-- Поле для минимальной цены -->
+    <input type="text" name="max_price" placeholder="До"> <!-- Поле для максимальной цены -->
+
+    <!-- Выпадающий список для выбора типа жилья -->
+    <select name="housing_type" id="housing_type_filter">
+        <option value="">Тип жилья</option>
+        <option value="дом" {% if request.form.housing_type == 'дом' %}selected{% endif %}>Дом</option>
+        <option value="квартира" {% if request.form.housing_type == 'квартира' %}selected{% endif %}>Квартира</option>
+        <option value="комната" {% if request.form.housing_type == 'комната' %}selected{% endif %}>Комната</option>
+    </select>
+
+    <!-- Выпадающий список для выбора количества комнат -->
+    <select name="rooms" id="rooms_filter">
+        <option value="">Комнат</option>
+        {% for r in range(1, 8) %} <!-- Цикл для генерации опций количества комнат -->
+            <option value="{{ r }}" {% if request.form.rooms == r|string %}selected{% endif %}>{{ r if r < 7 else '7+' }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="text" name="city" placeholder="Город" value="{{ request.form.city }}"> <!-- Поле для ввода города -->
+
+    <button type="submit">Поиск</button> <!-- Кнопка для отправки формы и применения фильтров -->
+</form>
+
+<div class="listing-vertical"> <!-- Контейнер для вертикального отображения списка объявлений -->
+    {% for item in listings %} <!-- Цикл для перебора каждого объявления в списке 'listings' -->
+    <div class="listing-row"> <!-- Контейнер для одного объявления -->
+        <img src="{{ item.image }}" alt="Apartment"> <!-- Изображение объявления -->
+        <div class="listing-details"> <!-- Детали объявления -->
+            <a href="{{ url_for('listing_detail', listing_id=item.id) }}"> <!-- Ссылка на детальную страницу объявления -->
+                <h3>{{ item.price }} Br</h3> <!-- Цена объявления -->
+            </a>
+            <p>{{ item.description }}</p> <!-- Краткое описание -->
+            <small>{{ item.details }} | {{ item.rooms }} комн | {{ item.type }} | {{ item.housing_type }}</small> <!-- Дополнительные детали -->
+            <small>Телефон: {{ item.phone }}</small> <!-- Телефон -->
+        </div>
+        <!-- Форма для добавления объявления в избранное -->
+        <form method="post" action="/add_favorite/{{ item.id }}">
+            <button type="submit">❤</button> <!-- Кнопка "Добавить в избранное" -->
+        </form>
+        
+    </div>
+    {% else %}
+        <p>Нет подходящих предложений.</p> <!-- Сообщение, если список объявлений пуст -->
+    {% endfor %}
+</div>
+
+<!-- Скрипт для управления доступностью фильтра комнат в зависимости от выбранного типа жилья -->
+<script>
+    // Блокируем выбор комнат, если выбрана "комната"
+    const housingSelectFilter = document.getElementById('housing_type_filter'); // Получение элемента выбора типа жилья
+    const roomsSelectFilter = document.getElementById('rooms_filter'); // Получение элемента выбора количества комнат
+
+    function toggleRoomsFilter() { // Функция для переключения состояния фильтра комнат
+        if (housingSelectFilter.value === 'комната') { // Если выбран тип "комната"
+            roomsSelectFilter.value = ''; // Сбросить выбранное количество комнат
+            roomsSelectFilter.disabled = true; // Заблокировать выбор комнат
+        } else {
+            roomsSelectFilter.disabled = false; // Разблокировать выбор комнат
+        }
+    }
+
+    housingSelectFilter.addEventListener('change', toggleRoomsFilter); // Вызов функции при изменении типа жилья
+    window.addEventListener('load', toggleRoomsFilter); // Вызов функции при загрузке страницы для установки начального состояния
+</script>
+{% endblock %} <!-- Конец блока основного контента -->
+>>>>>>> Stashed changes
