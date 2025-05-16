@@ -1,0 +1,63 @@
+.favorites-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+.favorites-card:hover {
+    transform: translateY(-2px);
+}
+
+.favorites-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.favorites-info {
+    padding: 16px;
+    flex-grow: 1;
+}
+
+.favorites-price {
+    margin: 0;
+    font-size: 22px;
+    color: #007bff;
+}
+
+.favorites-description {
+    margin: 10px 0;
+    color: #333;
+}
+
+.favorites-meta,
+.favorites-phone {
+    font-size: 14px;
+    color: #666;
+}
+
+.favorites-remove-form {
+    padding: 0 16px 16px;
+}
+
+.favorites-remove-form button {
+    padding: 8px 12px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+    width: 100%;
+}
+
+.favorites-remove-form button:hover {
+    background-color: #c82333;
+}
