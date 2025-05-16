@@ -122,10 +122,77 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 
+# ---------- ОБЪЯВЛЕНИЯ ----------
+# Маршруты и функции, связанные с отображением, добавлением и управлением объявлениями.
+
+@app.route('/rent', methods=['GET', 'POST'])
+def rent():
+    """
+    Отображает страницу с объявлениями об аренде.
+    Позволяет фильтровать объявления по цене, количеству комнат, городу и типу жилья.
+    """
+    # Устанавливаем соединение с базой данных
     conn = sqlite3.connect('users.db')
+    # Устанавливаем row_factory для доступа к данным по именам колонок
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username=?", (username,))
-    user = c.fetchone()
+
+    # Базовый SQL-запрос для выборки объявлений об аренде
+    query = "SELECT * FROM listings WHERE deal_type = 'rent'"
+    filters = []  # Список для хранения условий фильтрации
+    values = []   # Список для хранения значений для SQL-запроса
+
+    # Инициализация переменных для сохранения значений фильтров (чтобы передать их обратно в шаблон)
+    housing_type = ''
+    rooms = ''
+
+    # Если запрос методом POST (т.е. пользователь применил фильтры)
+    if request.method == 'POST':
+        # Получаем значения фильтров из формы
+        min_price = request.form.get('min_price')
+        max_price = request.form.get('max_price')
+        rooms = request.form.get('rooms')
+        city = request.form.get('city')
+        housing_type = request.form.get('housing_type')
+
+        # Добавляем условия в запрос в зависимости от заполненных полей фильтра
+        if min_price:
+            filters.append("price >= ?")
+            values.append(int(min_price))
+        if max_price:
+            filters.append("price <= ?")
+            values.append(int(max_price))
+        if housing_type:
+            filters.append("housing_type = ?")
+            values.append(housing_type)
+            # Если выбран тип жилья "комната", то фильтр по количеству комнат игнорируется
+            if housing_type == 'комната':
+                rooms = '' # Сбрасываем значение rooms, чтобы оно не учитывалось
+        if rooms and rooms.isdigit(): # Проверяем, что rooms указано и является числом
+            filters.append("rooms = ?")
+            values.append(int(rooms))
+        if city:
+            filters.append("city = ?")
+            values.append(city)
+             # Если выбрана "комната" — фильтруем только по housing_type, rooms игнорируем
+        if housing_type != 'комната' and rooms: # Если не комната и указано количество комнат
+            filters.append("rooms = ?")
+            values.append(int(rooms))
+
+
+    # Если есть активные фильтры, добавляем их к SQL-запросу
+    if filters:
+        query += " AND " + " AND ".join(filters)
+
+    # Выполняем SQL-запрос с параметрами
+    c.execute(query, values)
+    listings = c.fetchall()  # Получаем все отфильтрованные объявления
+    conn.close()  # Закрываем соединение с базой данных
+
+    # Отображаем шаблон 'rent.html', передавая список объявлений и текущие значения фильтров
+    return render_template('rent.html', listings=listings, housing_type=housing_type, rooms=rooms)
+
+
     conn.close()
 
     if user and check_password_hash(user[2], password):
