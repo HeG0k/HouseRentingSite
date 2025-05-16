@@ -346,10 +346,34 @@ def listing_detail(listing_id):
     return render_template('listing_detail.html', listing=listing)
 
 
+# ---------- ИЗБРАННОЕ ----------
+# Маршруты и функции для управления списком избранных объявлений пользователя.
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
+@app.route('/favorites')
+@login_required # Доступ только для аутентифицированных пользователей
+def favorites():
+    """
+    Отображает страницу с избранными объявлениями текущего пользователя.
+    """
+    user_id = session['user_id']  # ID текущего пользователя
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # SQL-запрос для получения всех объявлений, добавленных пользователем в избранное
+    c.execute('''
+        SELECT l.*
+        FROM listings l
+        JOIN favorites f ON l.id = f.listing_id
+        WHERE f.user_id = ?
+    ''', (user_id,))
+    favorites = c.fetchall()  # Получаем список избранных объявлений
+    conn.close()
+    return render_template('favorites.html', favorites=favorites)
+
     if session.get('role') != 0:
         flash('Доступ запрещен.', 'danger')
         return redirect(url_for('rent'))
