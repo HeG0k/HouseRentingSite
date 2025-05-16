@@ -1,49 +1,92 @@
-
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-import sqlite3
-from werkzeug.security import generate_password_hash, check_password_hash
-from functools import wraps
-import os
-from werkzeug.utils import secure_filename
+import sqlite3  # Для работы с базой данных SQLite
+from werkzeug.security import generate_password_hash, check_password_hash  # Для хеширования и проверки паролей
+from functools import wraps  # Для создания декораторов
+import os  # Для работы с операционной системой (например, пути к файлам)
+from werkzeug.utils import secure_filename  # Для безопасной обработки имен файлов
 
+# Инициализация Flask приложения
 app = Flask(__name__)
+# Секретный ключ для сессий Flask (важно для безопасности)
 app.secret_key = 'your_secret_key'
-
+# Разрешенные расширения для загружаемых файлов
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-
+# Папка для сохранения загруженных файлов
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
+# ---------- ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ ----------
+# Функции и код, связанные с созданием и настройкой базы данных.
+
 def init_db():
+    """
+    Инициализирует базу данных, создает таблицы, если они еще не существуют.
+    """
+    # Устанавливаем соединение с файлом базы данных 'users.db'
     conn = sqlite3.connect('users.db')
+    # Создаем курсор для выполнения SQL-запросов
     c = conn.cursor()
 
-    # Создание таблицы пользователей
+    # Включаем поддержку внешних ключей для соединения (важно для SQLite для обеспечения целостности данных)
+    c.execute("PRAGMA foreign_keys = ON")
+
+    # Создание таблицы 'users' для хранения информации о пользователях
+    # Поля: id (первичный ключ), username (уникальный), password (хешированный),
+    # role (роль пользователя, по умолчанию 1 - обычный пользователь),
+    # display_name (отображаемое имя), profile_image (путь к изображению профиля).
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
-            role INTEGER NOT NULL DEFAULT 1
+            role INTEGER NOT NULL DEFAULT 1,
+            display_name TEXT,          -- <--- ДОБАВЛЕНО (Отображаемое имя пользователя)
+            profile_image TEXT          -- <--- ДОБАВЛЕНО (Путь к аватару пользователя)
         )
     ''')
 
-    # Создание таблицы объявлений с добавленным полем для площади
+    # Создание таблицы 'listings' для хранения информации об объявлениях
+    # Поля: id (первичный ключ), image (путь к изображению), price (цена),
+    # rooms (количество комнат), description (описание), details (детали),
+    # deal_type (тип сделки: аренда/продажа), housing_type (тип жилья: дом/квартира/комната),
+    # city (город), area (площадь), phone (телефон), user_id (внешний ключ к таблице users).
+    # При удалении пользователя, объявления этого пользователя получают user_id = NULL.
     c.execute('''
         CREATE TABLE IF NOT EXISTS listings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             image TEXT,
             price INTEGER,
             rooms INTEGER,
-            district TEXT,
             description TEXT,
             details TEXT,
-            type TEXT,
+            deal_type TEXT,      -- rent/sale (Тип сделки: аренда/продажа)
+            housing_type TEXT,   -- дом/квартира/комната (Тип жилья)
             city TEXT,
-            area INTEGER
+            area INTEGER,
+            phone TEXT,
+            user_id INTEGER,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         )
     ''')
 
+    # Создание таблицы 'favorites' для хранения избранных объявлений пользователей
+    # Поля: id (первичный ключ), user_id (внешний ключ к таблице users),
+    # listing_id (внешний ключ к таблице listings).
+    # Пара (user_id, listing_id) должна быть уникальной.
+    # При удалении пользователя или объявления, соответствующие записи в избранном также удаляются (ON DELETE CASCADE).
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS favorites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            listing_id INTEGER NOT NULL,
+            UNIQUE(user_id, listing_id),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE
+        )
+    ''')
+    
+    # Сохраняем изменения в базе данных
     conn.commit()
+    # Закрываем соединение с базой данных
     conn.close()
 
 def login_required(f):
