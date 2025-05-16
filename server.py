@@ -513,6 +513,73 @@ def delete_user(user_id):
     flash('Пользователь удален.', 'user') # Сообщение об успехе
     return redirect(url_for('admin_users')) # Перенаправление на страницу управления пользователями
 
+@app.route('/admin/listings', methods=['GET'])
+@login_required # Требуется вход в систему
+def admin_listings():
+    """
+    Страница управления объявлениями в админ-панели.
+    Позволяет фильтровать и сортировать объявления.
+    """
+    # Проверка роли администратора
+    if session.get('role') != 0:
+        flash('Доступ запрещен.', 'danger')
+        return redirect(url_for('rent'))
+
+    # Получение параметров фильтрации и сортировки из GET-запроса
+    city = request.args.get('city', '').strip()
+    rooms = request.args.get('rooms', '').strip()
+    housing_type = request.args.get('housing_type', '').strip()
+    deal_type = request.args.get('deal_type', '').strip()  # новый параметр для типа сделки
+
+    # Параметры сортировки
+    sort_by = request.args.get('sort_by', 'id') # Поле для сортировки
+    order = request.args.get('order', 'asc') # Порядок сортировки (asc/desc)
+    # Валидация параметров сортировки
+    if sort_by not in ['id', 'price', 'rooms', 'housing_type']:
+        sort_by = 'id'
+    if order not in ['asc', 'desc']:
+        order = 'asc'
+
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # Базовый SQL-запрос для выборки объявлений с информацией о пользователе
+    query = '''
+        SELECT listings.*, users.username 
+        FROM listings 
+        LEFT JOIN users ON listings.user_id = users.id
+        WHERE 1=1
+    ''' 
+    params = [] # Список параметров для SQL-запроса
+
+    # Добавление условий фильтрации в запрос
+    if city:
+        query += ' AND city LIKE ?'
+        params.append(f'%{city}%')
+    if rooms and rooms.isdigit():
+        query += ' AND rooms = ?'
+        params.append(int(rooms))
+    if housing_type:
+        query += ' AND housing_type  = ?'
+        params.append(housing_type)
+    if deal_type:
+        query += ' AND deal_type = ?'
+        params.append(deal_type)
+
+    # Добавление сортировки в запрос
+    query += f' ORDER BY {sort_by} {order.upper()}'
+
+    c.execute(query, params)
+    listings = c.fetchall()
+    conn.close()
+
+    # Отображение шаблона с отфильтрованными и отсортированными объявлениями
+    return render_template('admin_listings.html', username=session.get('username'),
+                           listings=listings, sort_by=sort_by, order=order,
+                           city=city, rooms=rooms, housing_type=housing_type, deal_type=deal_type)
+
+
 
 @app.route('/register', methods=['POST'])
 def register():
