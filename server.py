@@ -317,6 +317,35 @@ def add_listing():
     return render_template('add_listing.html')
 
 
+@app.route('/listing/<int:listing_id>')
+def listing_detail(listing_id):
+    """
+    Отображает детальную информацию о конкретном объявлении.
+    Включает информацию о продавце (display_name, profile_image).
+    """
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # SQL-запрос для получения данных объявления и информации о пользователе, его разместившем
+    c.execute('''
+        SELECT l.*, u.display_name, u.profile_image
+        FROM listings l
+        LEFT JOIN users u ON l.user_id = u.id
+        WHERE l.id = ?
+    ''', (listing_id,))
+    listing = c.fetchone()  # Получаем одно объявление
+    conn.close()
+
+    # Если объявление не найдено, показываем сообщение и перенаправляем
+    if not listing:
+        flash("Объявление не найдено.", "danger")
+        return redirect(url_for('rent'))
+
+    # Отображаем шаблон с деталями объявления
+    return render_template('listing_detail.html', listing=listing)
+
+
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
