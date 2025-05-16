@@ -699,48 +699,72 @@ def login():
 
 @app.route('/register', methods=['POST'])
 def register():
+    """
+    Обрабатывает регистрацию нового пользователя.
+    Выполняет валидацию данных и сохраняет нового пользователя в базу данных.
+    """
     username = request.form['username']
     password = request.form['password']
 
+    # Валидация: проверка на наличие пробелов
     if ' ' in username or ' ' in password:
         flash('Пробелы запрещены в имени пользователя и пароле.', 'danger')
+        flash('Пробелы запрещены.', 'danger')
+        # Отображаем главную страницу с активной формой регистрации
         return render_template('index.html', show_register=True)
 
+    # Валидация: проверка длины имени пользователя
     if not (1 <= len(username) <= 32):
         flash('Имя пользователя должно быть от 1 до 32 символов.', 'danger')
         return render_template('index.html', show_register=True)
 
+    # Валидация: проверка длины пароля
     if not (8 <= len(password) <= 32):
         flash('Пароль должен быть от 8 до 32 символов.', 'danger')
         return render_template('index.html', show_register=True)
 
+    # Хеширование пароля
     hashed_password = generate_password_hash(password)
 
     try:
         conn = sqlite3.connect('users.db')
         c = conn.cursor()
+        # Вставляем нового пользователя с ролью 1 (обычный пользователь)
         c.execute("INSERT INTO users (username, password, role) VALUES (?, ?, 1)", (username, hashed_password))
         conn.commit()
 
         # Получаем ID нового пользователя
+        # Получаем ID и роль только что созданного пользователя для сессии
         c.execute("SELECT id, role FROM users WHERE username = ?", (username,))
         user = c.fetchone()
         conn.close()
 
         # Сохраняем в сессию
         session['user_id'] = user[0]
+        # Автоматический вход после регистрации
+        session['user_id'] = user[0] # id
         session['username'] = username
         session['role'] = user[1]
 
         return redirect('/rent' if user[1] == 1 else '/admin')
+        session['role'] = user[1] # role
+        # Перенаправляем на страницу аренды (т.к. роль по умолчанию 1)
+        return redirect('/rent' if user[1] == 1 else '/admin') # '/admin' здесь маловероятно, т.к. role=1
 
     except sqlite3.IntegrityError:
+        # Если имя пользователя уже существует (из-за UNIQUE ограничения в БД)
         flash('Имя пользователя уже существует.', 'danger')
         return redirect(url_for('index'))
+        return redirect(url_for('index')) # Возвращаем на главную страницу
 
 @app.route('/logout')
 def logout():
     session.clear()
+    """
+    Обрабатывает выход пользователя из системы.
+    Очищает сессию.
+    """
+    session.clear() # Удаляем все данные из сессии
     flash('Вы вышли из аккаунта.', 'success')
     return redirect(url_for('index'))
 
@@ -749,6 +773,7 @@ def rent():
     conn = sqlite3.connect('users.db')
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
+    return redirect(url_for('index')) # Перенаправляем на главную страницу
 
     query = "SELECT * FROM listings WHERE 1"
     filters = []
