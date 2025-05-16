@@ -96,3 +96,50 @@ button:hover {
 .guest-link:hover {
     color: #0056b3;
 }
+<<<<<<< Updated upstream
+=======
+
+body {
+    position: relative;
+    z-index: 0;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 50vw;     
+    height: 100vh;
+    background-image: url('/static/images/left.png');
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: contain;
+    opacity: 0.15;
+    z-index: -1;
+
+    mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%);
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%);
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 50vw;    
+    height: 100vh;
+    background-image: url('/static/images/right.png');
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: contain;
+    opacity: 0.15;
+    
+    z-index: -1;
+
+    mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%);
+    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%);
+}
+
+
+>>>>>>> Stashed changes
