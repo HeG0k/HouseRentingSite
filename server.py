@@ -102,22 +102,25 @@ def inject_user():
     return dict(user_id=session.get('user_id'))
 
 def login_required(f):
+    """
+    Декоратор для ограничения доступа к маршрутам только для аутентифицированных пользователей.
+    Если пользователь не вошел в систему, он перенаправляется на страницу входа.
+    """
     @wraps(f)
     def decorated(*args, **kwargs):
-        if 'user_id' not in session:
-            flash('Пожалуйста, авторизуйтесь', 'danger')
-            return redirect(url_for('index'))
-        return f(*args, **kwargs)
+        if not session.get('user_id'):
+            flash('Пожалуйста, войдите в аккаунт.')  # Сообщение для пользователя
+            return redirect(url_for('login'))  # Перенаправление на страницу входа
+        return f(*args, **kwargs)  # Выполнение исходной функции, если пользователь аутентифицирован
     return decorated
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+def allowed_file(filename):
+    """
+    Проверяет, имеет ли загружаемый файл разрешенное расширение.
+    """
+    # Проверяем наличие точки в имени файла и соответствие расширения списку ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
-@app.route('/login', methods=['POST'])
-def login():
-    username = request.form['username']
-    password = request.form['password']
 
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
