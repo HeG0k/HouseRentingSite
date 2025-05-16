@@ -463,29 +463,34 @@ def admin_users():
     # Отображаем шаблон с пользователями
     return render_template('admin_users.html', username=session.get('username'), users=users, title="Пользователи")
 
-@app.route('/admin/create_user', methods=['POST'])
-@login_required
+@app.route('/admin/users/create', methods=['POST'])
+@login_required # Требуется вход в систему
 def create_user():
+    """
+    Создание нового пользователя администратором.
+    """
+    # Проверка роли администратора
     if session.get('role') != 0:
         flash('Доступ запрещен.', 'danger')
-        return redirect(url_for('admin'))
+        return redirect(url_for('rent'))
 
-    conn = sqlite3.connect('users.db')
-    c = conn.cursor()
-
+    # Получение данных нового пользователя из формы
     username = request.form['username']
     password = request.form['password']
     role = int(request.form['role'])
 
-    c.execute('''
-        INSERT INTO users (username, password, role)
-        VALUES (?, ?, ?)
-    ''', (username, password, role))
+    # Хеширование пароля
+    hashed_password = generate_password_hash(password)
+
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    # Вставка нового пользователя в базу данных
+    c.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', (username, hashed_password, role))
     conn.commit()
     conn.close()
 
-    flash('Пользователь создан.', 'user')
-    return redirect(url_for('admin'))
+    flash('Пользователь создан.', 'user') # Сообщение об успехе
+    return redirect(url_for('admin_users')) # Перенаправление на страницу управления пользователями
 
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @login_required
