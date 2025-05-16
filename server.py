@@ -374,6 +374,49 @@ def favorites():
     conn.close()
     return render_template('favorites.html', favorites=favorites)
 
+@app.route('/add_favorite/<int:item_id>', methods=['POST'])
+@login_required # Доступ только для аутентифицированных пользователей
+def add_favorite(item_id):
+    """
+    Добавляет объявление в список избранного для текущего пользователя.
+    """
+    user_id = session['user_id']
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    try:
+        # Пытаемся добавить запись в таблицу favorites.
+        c.execute('INSERT OR IGNORE INTO favorites (user_id, listing_id) VALUES (?, ?)', (user_id, item_id))
+        conn.commit()
+        flash('Добавлено в избранное!')
+    except sqlite3.Error: # Более общая обработка ошибок SQLite
+        flash('Ошибка добавления в избранное.')
+    finally:
+        conn.close()
+    # Перенаправляем пользователя на предыдущую страницу или на страницу аренды
+    return redirect(request.referrer or url_for('rent'))
+
+@app.route('/remove_favorite/<int:item_id>', methods=['POST'])
+@login_required # Доступ только для аутентифицированных пользователей
+def remove_favorite(item_id):
+    """
+    Удаляет объявление из списка избранного для текущего пользователя.
+    """
+    user_id = session['user_id']
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    try:
+        # Удаляем запись из таблицы favorites
+        c.execute('DELETE FROM favorites WHERE user_id = ? AND listing_id = ?', (user_id, item_id))
+        conn.commit()
+        flash('Удалено из избранного.', 'success')
+    except sqlite3.Error: # Более общая обработка ошибок SQLite
+        flash('Ошибка удаления.', 'danger')
+    finally:
+        conn.close()
+    # Перенаправляем пользователя на предыдущую страницу или на страницу избранного
+    return redirect(request.referrer or url_for('favorites'))
+
+
     if session.get('role') != 0:
         flash('Доступ запрещен.', 'danger')
         return redirect(url_for('rent'))
