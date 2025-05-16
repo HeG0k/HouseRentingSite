@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -13,3 +14,66 @@
     </ul>
 </body>
 </html>
+=======
+{% extends "base.html" %} <!-- Наследование от базового шаблона "base.html" -->
+{% block head %} <!-- Начало блока 'head', который расширяет блок 'head' из базового шаблона -->
+    {{ super() }} <!-- Включение содержимого блока 'head' из родительского шаблона -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}"> <!-- Подключение CSS файла для страницы профиля -->
+{% endblock %}
+
+{% block content %} <!-- Начало блока основного контента страницы -->
+<h2>Личный кабинет</h2>
+
+<div class="profile-container"> <!-- Основной контейнер для содержимого профиля -->
+
+  <!-- Секция информации о профиле пользователя -->
+  <div class="profile-info">
+    <!-- Отображение аватара пользователя или изображения по умолчанию -->
+    <img src="{{ profile_image or '/static/default_avatar.png' }}"
+         alt="Фото профиля"
+         class="profile-avatar">
+  
+    <div class="profile-details">
+      <!-- Форма для обновления имени и фотографии профиля -->
+      <form method="POST" enctype="multipart/form-data" action="{{ url_for('profile') }}" class="profile-form">
+        <div class="name-row">
+          <label for="display_name">Имя:</label>
+          <input type="text" id="display_name" name="display_name" value="{{ display_name }}"> <!-- Поле для ввода/отображения имени пользователя -->
+        </div>
+  
+        <label for="profile_image">Фото профиля:</label>
+        <input type="file" id="profile_image" name="profile_image" accept="image/*"> <!-- Поле для загрузки нового фото профиля -->
+  
+        <button type="submit">Сохранить</button> <!-- Кнопка сохранения изменений профиля -->
+      </form>
+    </div>
+  </div>
+
+  <!-- Секция объявлений пользователя -->
+  <div class="listings">
+    <h3>Мои объявления</h3>
+    {% if listings %} <!-- Проверка, есть ли у пользователя объявления -->
+      <div class="listing-grid"> <!-- Контейнер для отображения объявлений в виде сетки -->
+        {% for listing in listings %} <!-- Цикл для перебора каждого объявления пользователя -->
+          <div class="listing-card"> <!-- Карточка одного объявления -->
+            {% if listing.image %} <!-- Проверка, есть ли изображение у объявления -->
+              <img src="{{ listing.image }}" alt="Фото объявления" class="listing-image">
+            {% else %}
+              <div class="listing-placeholder">Нет фото</div> <!-- Заглушка, если изображения нет -->
+            {% endif %}
+            <p><strong>Тип:</strong> {{ listing.type|capitalize }}</p> <!-- Тип объявления -->
+            <p><strong>Цена:</strong> {{ listing.price }}₽</p> <!-- Цена -->
+            <p><strong>Комнаты:</strong> {{ listing.rooms }}</p> <!-- Количество комнат -->
+            <p><strong>Телефон:</strong> {{ listing.phone }}</p> <!-- Телефон -->
+            <p class="listing-description">{{ listing.description or 'Описание отсутствует' }}</p> <!-- Описание объявления -->
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>Объявлений нет.</p> <!-- Сообщение, если у пользователя нет объявлений -->
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %} <!-- Конец блока основного контента -->
+>>>>>>> Stashed changes
