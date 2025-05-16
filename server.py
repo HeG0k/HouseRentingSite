@@ -785,6 +785,8 @@ def rent():
         rooms = request.form.get('rooms')
         district = request.form.get('district')
         type_of_property = request.form.get('type')
+# ---------- ГЛАВНАЯ ----------
+# Маршрут для главной страницы приложения.
 
         if min_price:
             filters.append("price >= ?")
@@ -809,6 +811,13 @@ def rent():
 
     if filters:
         query += " AND " + " AND ".join(filters)
+@app.route('/')
+def index():
+    """
+    Отображает главную страницу приложения (index.html).
+    Эта страница обычно содержит формы входа и регистрации.
+    """
+    return render_template('index.html')
 
     c.execute(query, values)
     listings = c.fetchall()
@@ -819,7 +828,11 @@ def rent():
 @login_required
 def profile():
     return render_template('profile.html', username=session.get('username'))
+# ---------- ЗАПУСК ----------
+# Код для запуска Flask-приложения.
 
 if __name__ == '__main__':
+    # Инициализируем базу данных при первом запуске (или если таблицы не созданы)
     init_db()
+    app.run(debug=True)
     app.run(debug=True)
