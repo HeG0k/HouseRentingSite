@@ -605,6 +605,62 @@ def delete_listing():
     return redirect(url_for('admin_listings')) # Перенаправление на страницу управления объявлениями
 
 
+# ---------- ПРОФИЛЬ И АВТОРИЗАЦИЯ ----------
+# Маршруты и функции, связанные с профилем пользователя, входом, регистрацией и выходом.
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required # Доступ только для аутентифицированных пользователей
+def profile():
+    """
+    Страница профиля пользователя.
+    Позволяет обновлять отображаемое имя и изображение профиля.
+    Отображает объявления, созданные текущим пользователем.
+    """
+    user_id = session.get('user_id')
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # Если метод POST (т.е. пользователь обновляет профиль)
+    if request.method == 'POST':
+        display_name = request.form.get('display_name')
+        profile_image = None # Инициализация переменной для пути к изображению
+
+        # Обработка загрузки нового изображения профиля
+        if 'profile_image' in request.files:
+            file = request.files['profile_image']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(image_path)
+                profile_image = f"/static/uploads/{filename}"
+
+        # Обновление отображаемого имени, если оно было предоставлено
+        if display_name:
+            c.execute('UPDATE users SET display_name = ? WHERE id = ?', (display_name, user_id))
+        # Обновление изображения профиля, если оно было загружено
+        if profile_image:
+            c.execute('UPDATE users SET profile_image = ? WHERE id = ?', (profile_image, user_id))
+
+        conn.commit() # Сохранение изменений
+        flash("Профиль обновлен.", "success")
+
+    # Получение актуальных данных пользователя (отображаемое имя, изображение)
+    c.execute("SELECT display_name, profile_image FROM users WHERE id = ?", (user_id,))
+    user = c.fetchone()
+
+    # Получение объявлений, созданных текущим пользователем
+    c.execute("SELECT * FROM listings WHERE user_id = ?", (user_id,))
+    listings = c.fetchall()
+
+    conn.close()
+
+    # Отображение шаблона профиля
+    return render_template('profile.html',
+                       display_name=user['display_name'] or session.get('username'), # Используем display_name, если есть, иначе username
+                       profile_image=user['profile_image'],
+                       listings=listings,
+                       )
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form['username']
