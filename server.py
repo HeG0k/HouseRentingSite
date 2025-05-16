@@ -89,6 +89,18 @@ def init_db():
     # Закрываем соединение с базой данных
     conn.close()
 
+
+# ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
+# Общие утилиты и декораторы, используемые в приложении.
+
+@app.context_processor
+def inject_user():
+    """
+    Внедряет 'user_id' в контекст шаблонов Jinja2.
+    Это позволяет проверять, залогинен ли пользователь, прямо в шаблонах.
+    """
+    return dict(user_id=session.get('user_id'))
+
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
