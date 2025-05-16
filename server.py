@@ -299,8 +299,24 @@ def add_listing():
         else:
             rooms = int(request.form['rooms']) # Прямое преобразование из формы
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+        # Сохранение объявления в базу данных
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO listings 
+            (image, price, rooms, description, details, deal_type, housing_type, city, area, phone, user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (image, price, rooms, description, details, deal_type, housing_type_form, city, area, phone, user_id))
+        conn.commit()
+        conn.close()
+
+        flash("Объявление добавлено!")  # Сообщение об успехе
+        return redirect(url_for('profile'))  # Перенаправление на страницу профиля
+
+    # Если метод GET, отображаем форму добавления объявления
+    return render_template('add_listing.html')
+
+
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
