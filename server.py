@@ -237,11 +237,67 @@ def sale():
 
     return render_template('sale.html', listings=listings)
 
+@app.route('/add', methods=['GET', 'POST'])
+@login_required  # Доступ только для аутентифицированных пользователей
+def add_listing():
+    """
+    Обрабатывает добавление нового объявления.
+    При GET-запросе отображает форму добавления.
+    При POST-запросе сохраняет данные нового объявления в базу данных.
+    """
+    if request.method == 'POST':
+        # Обработка загрузки изображения
+        image = None
+        if 'image' in request.files:
+            file = request.files['image']
+            # Если файл выбран и имеет разрешенное расширение
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)  # Безопасное имя файла
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)  # Сохранение файла
+                image = f"/static/uploads/{filename}"  # Путь к файлу для сохранения в БД
+
+        # Получение данных из формы
+        price = int(request.form['price'])
+        housing_type = request.form.get('housing_type', '') # Тип жилья
+
+        # Если тип жилья "комната", количество комнат устанавливается в 1
+        if housing_type == 'комната':
+            rooms = 1
         else:
-            return redirect('/rent')
-    else:
-        flash('Неверные учетные данные.', 'danger')
-        return redirect(url_for('index'))
+            rooms_raw = request.form.get('rooms')
+            try:
+                # Преобразование количества комнат в целое число, если оно указано
+                rooms = int(rooms_raw) if rooms_raw else 0
+            except ValueError:
+                rooms = 0 # Если не удалось преобразовать, считаем 0 комнат
+        
+        description = request.form['description']
+        details = request.form['details']
+        housing_type_form = request.form['housing_type'] # Повторное получение, возможно для другой логики (переменная housing_type уже есть)
+        deal_type = request.form['deal_type']
+        city = request.form['city']
+        area = int(request.form['area'])
+        phone = request.form['phone']
+        user_id = session.get('user_id') # ID текущего пользователя из сессии
+
+        # Получение координат с карты (если они переданы)
+        latitude = request.form.get('latitude')
+        longitude = request.form.get('longitude')
+
+        # Попытка преобразовать координаты в float
+        try:
+            latitude = float(latitude) if latitude else None
+            longitude = float(longitude) if longitude else None
+        except ValueError:
+            latitude = None
+            longitude = None
+
+        # Повторная логика установки количества комнат для "комнаты"
+        if housing_type_form == 'комната': # Используется housing_type_form
+            rooms = 1
+        else:
+            rooms = int(request.form['rooms']) # Прямое преобразование из формы
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
