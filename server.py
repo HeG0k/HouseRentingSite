@@ -417,90 +417,51 @@ def remove_favorite(item_id):
     return redirect(request.referrer or url_for('favorites'))
 
 
+# ---------- АДМИНКА ----------
+# Маршруты и функции для административной панели.
+
+@app.route('/admin')
+@login_required # Требуется вход в систему
+def admin_index():
+    """
+    Главная страница административной панели.
+    Перенаправляет на управление пользователями, если пользователь - админ.
+    """
+    # Проверка, является ли пользователь администратором (role == 0)
+    if session.get('role') != 0:
+        flash('Доступ запрещен.', 'danger') # Сообщение об ошибке доступа
+        return redirect(url_for('rent')) # Перенаправление на страницу аренды
+    return redirect(url_for('admin_users')) # Перенаправление на страницу управления пользователями
+
+@app.route('/admin/users', methods=['GET'])
+@login_required # Требуется вход в систему
+def admin_users():
+    """
+    Страница управления пользователями в админ-панели.
+    Позволяет просматривать и искать пользователей.
+    """
+    # Проверка роли администратора
     if session.get('role') != 0:
         flash('Доступ запрещен.', 'danger')
         return redirect(url_for('rent'))
 
+    # Получение параметра поиска из GET-запроса
+    search_username = request.args.get('search', '')
     conn = sqlite3.connect('users.db')
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
-    # Фильтрация пользователей по имени
-    search_username = request.args.get('search', '')
+    # Если есть поисковый запрос, фильтруем пользователей по имени
     if search_username:
         c.execute('SELECT * FROM users WHERE username LIKE ?', ('%' + search_username + '%',))
     else:
+        # Иначе получаем всех пользователей
         c.execute('SELECT * FROM users')
-    
     users = c.fetchall()
-
-    # Добавление нового объявления
-    if request.method == 'POST':
-        if request.form.get('action') == 'add':
-            # Загружаем изображение
-            image = None
-            if 'image' in request.files:
-                file = request.files['image']
-                if file and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    file.save(image_path)
-                    image = f"/static/uploads/{filename}"
-
-            price = int(request.form['price'])
-            rooms = int(request.form['rooms'])
-            district = request.form['district']
-            description = request.form['description']
-            details = request.form['details']
-            listing_type = request.form['type']
-            city = request.form['city']
-            area = int(request.form['area'])
-
-            c.execute('''
-                INSERT INTO listings (image, price, rooms, district, description, details, type, city, area)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (image, price, rooms, district, description, details, listing_type, city, area))
-            conn.commit()
-            flash('Объявление добавлено.', 'listing')
-
-        elif request.form.get('action') == 'delete':
-            listing_id = int(request.form['listing_id'])
-            c.execute('DELETE FROM listings WHERE id = ?', (listing_id,))
-            conn.commit()
-            flash('Объявление удалено.', 'listing')
-
-        elif request.form.get('action') == 'create_user':
-            username = request.form['username']
-            password = request.form['password']
-            role = int(request.form['role'])
-
-            c.execute('''
-                INSERT INTO users (username, password, role)
-                VALUES (?, ?, ?)
-            ''', (username, password, role))
-            conn.commit()
-            flash('Пользователь создан.', 'user')
-
-        elif request.form.get('action') == 'delete_user':
-            user_id = int(request.form['user_id'])
-            c.execute('DELETE FROM users WHERE id = ?', (user_id,))
-            conn.commit()
-            flash('Пользователь удален.', 'user')
-
-    # Сортировка
-    sort_by = request.args.get('sort_by', 'id')
-    order = request.args.get('order', 'asc')
-    if sort_by not in ['id', 'price', 'rooms', 'type']:
-        sort_by = 'id'
-    if order not in ['asc', 'desc']:
-        order = 'asc'
-
-    c.execute(f'SELECT * FROM listings ORDER BY {sort_by} {order.upper()}')
-    listings = c.fetchall()
-
     conn.close()
 
-    return render_template('admin.html', username=session.get('username'), listings=listings, users=users, sort_by=sort_by, order=order)
+    # Отображаем шаблон с пользователями
+    return render_template('admin_users.html', username=session.get('username'), users=users, title="Пользователи")
 
 @app.route('/admin/create_user', methods=['POST'])
 @login_required
