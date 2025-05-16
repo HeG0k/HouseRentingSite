@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 .container {
     max-width: 1100px;
     margin: 30px auto;
@@ -117,3 +118,96 @@ form {
     background-color: #f1f8e9;
     color: #33691e;
 }
+=======
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 40px; 
+}
+
+h1, h2 {
+    color: #0056b3;
+    font-weight: 600;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    margin-left: 10px; 
+}
+
+form {
+    margin: 0 0 20px 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+form input[type="text"],
+form input[type="number"],
+form select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+}
+
+form button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background-color: #007BFF;
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-left: 10px;
+}
+
+table th, table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+table th {
+    background-color: #eaf3ff;
+    color: #0056b3;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+table tr:hover {
+    background-color: #f6f9fc;
+}
+
+td form button {
+    background-color: #dc3545;
+}
+
+td form button:hover {
+    background-color: #a71d2a;
+}
+
+>>>>>>> Stashed changes
