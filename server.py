@@ -580,6 +580,30 @@ def admin_listings():
                            city=city, rooms=rooms, housing_type=housing_type, deal_type=deal_type)
 
 
+@app.route('/admin/listings/delete', methods=['POST'])
+@login_required # Требуется вход в систему
+def delete_listing():
+    """
+    Удаление объявления администратором.
+    """
+    # Проверка роли администратора
+    if session.get('role') != 0:
+        flash('Доступ запрещен.', 'danger')
+        return redirect(url_for('rent'))
+
+    # Получение ID объявления для удаления из формы
+    listing_id = int(request.form['listing_id'])
+
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    # Удаление объявления из базы данных по ID
+    c.execute('DELETE FROM listings WHERE id = ?', (listing_id,))
+    conn.commit()
+    conn.close()
+
+    flash('Объявление удалено.', 'listing') # Сообщение об успехе
+    return redirect(url_for('admin_listings')) # Перенаправление на страницу управления объявлениями
+
 
 @app.route('/register', methods=['POST'])
 def register():
