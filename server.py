@@ -193,14 +193,50 @@ def rent():
     return render_template('rent.html', listings=listings, housing_type=housing_type, rooms=rooms)
 
 
+@app.route('/sale', methods=['GET', 'POST'])
+def sale():
+    """
+    Отображает страницу с объявлениями о продаже.
+    Позволяет фильтровать объявления по цене, количеству комнат и городу.
+    """
+    # Аналогично функции rent(), но для объявлений о продаже
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # Базовый SQL-запрос для выборки объявлений о продаже
+    query = "SELECT * FROM listings WHERE deal_type  = 'sale'"
+    filters = []
+    values = []
+
+    if request.method == 'POST':
+        min_price = request.form.get('min_price')
+        max_price = request.form.get('max_price')
+        rooms = request.form.get('rooms')
+        city = request.form.get('city')
+
+        if min_price:
+            filters.append("price >= ?")
+            values.append(int(min_price))
+        if max_price:
+            filters.append("price <= ?")
+            values.append(int(max_price))
+        if rooms:
+            filters.append("rooms = ?")
+            values.append(int(rooms))
+        if city:
+            filters.append("city = ?")
+            values.append(city)
+        
+    if filters:
+        query += " AND " + " AND ".join(filters)
+
+    c.execute(query, values)
+    listings = c.fetchall()
     conn.close()
 
-    if user and check_password_hash(user[2], password):
-        session['user_id'] = user[0]
-        session['username'] = user[1]
-        session['role'] = user[3]
-        if user[3] == 0:
-            return redirect('/admin')
+    return render_template('sale.html', listings=listings)
+
         else:
             return redirect('/rent')
     else:
