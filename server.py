@@ -492,22 +492,27 @@ def create_user():
     flash('Пользователь создан.', 'user') # Сообщение об успехе
     return redirect(url_for('admin_users')) # Перенаправление на страницу управления пользователями
 
-@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
-@login_required
+@app.route('/admin/users/delete/<int:user_id>', methods=['POST'])
+@login_required # Требуется вход в систему
 def delete_user(user_id):
+    """
+    Удаление пользователя администратором.
+    """
+    # Проверка роли администратора
     if session.get('role') != 0:
         flash('Доступ запрещен.', 'danger')
-        return redirect(url_for('admin'))
+        return redirect(url_for('rent'))
 
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-
+    # Удаление пользователя из базы данных по ID
     c.execute('DELETE FROM users WHERE id = ?', (user_id,))
     conn.commit()
     conn.close()
 
-    flash('Пользователь удален.', 'user')
-    return redirect(url_for('admin'))
+    flash('Пользователь удален.', 'user') # Сообщение об успехе
+    return redirect(url_for('admin_users')) # Перенаправление на страницу управления пользователями
+
 
 @app.route('/register', methods=['POST'])
 def register():
